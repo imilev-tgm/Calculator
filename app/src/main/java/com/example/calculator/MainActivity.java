@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize views
+
         input1 = findViewById(R.id.input1);
         input2 = findViewById(R.id.input2);
         output = findViewById(R.id.output);
@@ -39,14 +39,13 @@ public class MainActivity extends AppCompatActivity {
         buttonMS = findViewById(R.id.buttonMS);
         buttonMR = findViewById(R.id.buttonMR);
 
-        // Deactivate RadioButtons
+
         deactivateRadioButtons();
 
-        // Set listeners
         buttonCalculate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Get the selected operator
+
                 int selectedOperatorId = operatorGroup.getCheckedRadioButtonId();
                 String operator = "";
 
@@ -60,14 +59,14 @@ public class MainActivity extends AppCompatActivity {
                     operator = "/";
                 }
 
-                // Get the input values
+
                 double value1 = Double.parseDouble(input1.getText().toString());
                 double value2 = Double.parseDouble(input2.getText().toString());
 
-                // Perform calculation
+
                 double result = calculate(value1, value2, operator);
 
-                // Update output field
+
                 output.setText(String.valueOf(result));
                 if (result < 0) {
                     output.setTextColor(Color.RED);
@@ -79,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
 
         output.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
-                // Clear output field
+
+                // Output leeren
                 output.setText("");
                 return false;
             }
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
         buttonMS.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Save current calculation type to SharedPreferences
+                // Jetzige Operatortyp speichern
                 int selectedOperatorId = operatorGroup.getCheckedRadioButtonId();
                 sharedPreferences.edit().putInt(CALCULATION_TYPE_KEY, selectedOperatorId).apply();
                 Toast.makeText(MainActivity.this, "Gespeichert", Toast.LENGTH_SHORT).show();
@@ -96,14 +96,14 @@ public class MainActivity extends AppCompatActivity {
 
         buttonMR.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Restore calculation type from SharedPreferences
+                // Operatortyp laden
                 int savedOperatorId = sharedPreferences.getInt(CALCULATION_TYPE_KEY, R.id.buttonPlus);
                 RadioButton savedOperatorButton = findViewById(savedOperatorId);
                 savedOperatorButton.setChecked(true);
             }
         });
 
-        // Initialize SharedPreferences
+        // SharedPreferences initialisieren
         sharedPreferences = getSharedPreferences(SHARED_PREFS_KEY, MODE_PRIVATE);
     }
 
