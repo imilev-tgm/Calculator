@@ -66,13 +66,15 @@
             android:id="@+id/buttonMultiply"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/multiply" />
+            android:text="@string/multiply"
+            android:textStyle="bold"/>
 
         <RadioButton
             android:id="@+id/buttonDivide"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/divide" />
+            android:text="@string/divide"
+            android:textStyle="bold"/>
 
     </RadioGroup>
 
