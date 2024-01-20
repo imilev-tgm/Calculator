@@ -10,10 +10,13 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,13 +26,15 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText input1, input2;
     private TextView output;
-    private RadioGroup operatorGroup;
     private Button buttonCalculate, buttonMS, buttonMR;
+    private Spinner calculationTypeSpinner;
 
     private SharedPreferences sharedPreferences;
     private static final String SHARED_PREFS_KEY = "calculator_shared_prefs";
@@ -40,11 +45,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         input1 = findViewById(R.id.input1);
         input2 = findViewById(R.id.input2);
         output = findViewById(R.id.output);
-        operatorGroup = findViewById(R.id.operatorGroup);
+        calculationTypeSpinner = findViewById(R.id.calculationTypeSpinner);
+
         buttonCalculate = findViewById(R.id.buttonCalculate);
         buttonMS = findViewById(R.id.buttonMS);
         buttonMR = findViewById(R.id.buttonMR);
@@ -52,71 +57,67 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.header);
         setSupportActionBar(toolbar);
 
+        String[] calculationTypes = {"+", "-", "*", "/"};
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, calculationTypes);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        calculationTypeSpinner.setAdapter(dataAdapter);
 
-        deactivateRadioButtons();
+
+        calculationTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int selectedOperatorId = calculationTypeSpinner.getSelectedItemPosition();
+                // Now you can use the selected calculation type
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Handle the situation where no calculation type is selected
+            }
+        });
 
         buttonCalculate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                int selectedOperatorId = operatorGroup.getCheckedRadioButtonId();
-                String operator = "";
-
-                if (selectedOperatorId == R.id.buttonPlus) {
-                    operator = "+";
-                } else if (selectedOperatorId == R.id.buttonMinus) {
-                    operator = "-";
-                } else if (selectedOperatorId == R.id.buttonMultiply) {
-                    operator = "*";
-                } else if (selectedOperatorId == R.id.buttonDivide) {
-                    operator = "/";
-                }
-
-
-                double value1 = Double.parseDouble(input1.getText().toString());
-                double value2 = Double.parseDouble(input2.getText().toString());
-
-
-                double result = calculate(value1, value2, operator);
-
-
-                output.setText(String.valueOf(result));
-                if (result < 0) {
-                    output.setTextColor(Color.RED);
-                } else {
-                    output.setTextColor(Color.BLACK);
+                String operator = calculationTypeSpinner.getSelectedItem().toString();
+                try {
+                    double value1 = Double.parseDouble(input1.getText().toString());
+                    double value2 = Double.parseDouble(input2.getText().toString());
+                    double result = calculate(value1, value2, operator);
+                    output.setText(String.valueOf(result));
+                } catch (NumberFormatException e) {
+                    Toast.makeText(MainActivity.this, "Invalid input! Please enter valid numbers.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        output.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
 
-                // Output leeren
-                output.setText("");
-                return false;
-            }
-        });
 
         buttonMS.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Jetzige Operatortyp speichern
-                int selectedOperatorId = operatorGroup.getCheckedRadioButtonId();
-                sharedPreferences.edit().putInt(CALCULATION_TYPE_KEY, selectedOperatorId).apply();
-                Toast.makeText(MainActivity.this, "Gespeichert", Toast.LENGTH_SHORT).show();
+                // Save current calculation type
+                String selectedOperator = calculationTypeSpinner.getSelectedItem().toString();
+                sharedPreferences.edit().putString(CALCULATION_TYPE_KEY, selectedOperator).apply();
+                Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
             }
         });
+
 
         buttonMR.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Operatortyp laden
-                int savedOperatorId = sharedPreferences.getInt(CALCULATION_TYPE_KEY, R.id.buttonPlus);
-                RadioButton savedOperatorButton = findViewById(savedOperatorId);
-                savedOperatorButton.setChecked(true);
+                // Load saved calculation type
+                String savedOperator = sharedPreferences.getString(CALCULATION_TYPE_KEY, "+");
+                ArrayAdapter<String> adapter = (ArrayAdapter<String>) calculationTypeSpinner.getAdapter();
+                int savedOperatorId = adapter.getPosition(savedOperator);
+                calculationTypeSpinner.setSelection(savedOperatorId);
             }
         });
 
-        // SharedPreferences initialisieren
+
+
+
+
+        // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences(SHARED_PREFS_KEY, MODE_PRIVATE);
     }
 
@@ -141,23 +142,6 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        activateRadioButtons();
-    }
-
-    private void activateRadioButtons() {
-        for (int i = 0; i < operatorGroup.getChildCount(); i++) {
-            operatorGroup.getChildAt(i).setEnabled(true);
-        }
-    }
-
-    private void deactivateRadioButtons() {
-        for (int i = 0; i < operatorGroup.getChildCount(); i++) {
-            operatorGroup.getChildAt(i).setEnabled(false);
-        }
-    }
 
     // Called when the options menu is being created
     // Inflate the menu resource into the provided Menu object

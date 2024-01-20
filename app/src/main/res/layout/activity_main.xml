@@ -34,49 +34,17 @@
         android:inputType="number"
         />
 
-    <RadioGroup
-        android:id="@+id/operatorGroup"
+
+    <Spinner
+        android:id="@+id/calculationTypeSpinner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input1">
-
-        <RadioButton
-            android:id="@+id/buttonPlus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/plus"
-            android:checked="true"
-            android:textStyle="bold"/>
-
-        <RadioButton
-            android:id="@+id/buttonMinus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/minus"
-            android:textStyle="bold"/>
-
-        <RadioButton
-            android:id="@+id/buttonMultiply"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/multiply"
-            android:textStyle="bold"/>
-
-        <RadioButton
-            android:id="@+id/buttonDivide"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/divide"
-            android:textStyle="bold"/>
-
-    </RadioGroup>
+        app:layout_constraintTop_toBottomOf="@+id/input1"
+        app:layout_constraintBottom_toTopOf="@+id/input2" />
 
     <EditText
         android:id="@+id/input2"
@@ -88,7 +56,7 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/operatorGroup"
+        app:layout_constraintTop_toBottomOf="@+id/calculationTypeSpinner"
         android:height="48dp"
         android:inputType="number"/>
 
@@ -100,7 +68,9 @@
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input2" />
+        app:layout_constraintTop_toBottomOf="@+id/input2"
+        android:onClick="onClickCalculate"/>
+
 
     <Button
         android:id="@+id/buttonMS"
@@ -133,8 +103,6 @@
         app:layout_constraintTop_toBottomOf="@+id/buttonCalculate"
         android:textSize="24sp"
         android:gravity="center"/>
-
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
