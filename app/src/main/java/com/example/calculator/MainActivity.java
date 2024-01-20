@@ -1,10 +1,15 @@
 package com.example.calculator;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -12,7 +17,12 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.widget.Toolbar;
+
+import java.lang.reflect.Method;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
         buttonCalculate = findViewById(R.id.buttonCalculate);
         buttonMS = findViewById(R.id.buttonMS);
         buttonMR = findViewById(R.id.buttonMR);
+
+        Toolbar toolbar = findViewById(R.id.header);
+        setSupportActionBar(toolbar);
 
 
         deactivateRadioButtons();
@@ -145,4 +158,72 @@ public class MainActivity extends AppCompatActivity {
             operatorGroup.getChildAt(i).setEnabled(false);
         }
     }
+
+    // Called when the options menu is being created
+    // Inflate the menu resource into the provided Menu object
+    // Force the system to display the icons in the options menu
+    @SuppressLint("RestrictedApi")
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        if(menu instanceof MenuBuilder){
+            MenuBuilder m = (MenuBuilder) menu;
+            m.setOptionalIconsVisible(true);
+        }
+
+        return true;
+    }
+
+
+    // Called whenever an item in the options menu is selected
+    // Handle the selection of the "Reset" and "Info" items
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.reset) {
+            resetFields();
+            return true;
+        } else if (id == R.id.info) {
+            showInfo();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    // Called when a menu is opened
+    // Forces the system to display the icons in the options menu
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+            if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
+                try {
+                    Method m = menu.getClass().getDeclaredMethod(
+                            "setOptionalIconsVisible", Boolean.TYPE);
+                    m.setAccessible(true);
+                    m.invoke(menu, true);
+                } catch (Exception e) {
+                    Log.e(getClass().getSimpleName(), "onMenuOpened", e);
+                }
+            }
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
+
+    // Reset the input fields and the output field
+    private void resetFields() {
+        input1.setText("");
+        input2.setText("");
+        output.setText("");
+    }
+
+    // Display a toast message with information about the author and the version of the app
+    private void showInfo() {
+        String message = "Author: Ivan Milev\nVersion: 1.0";
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+
+
+
 }
